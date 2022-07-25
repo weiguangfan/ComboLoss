@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+# 导包。用来切割数据集。
 from sklearn.model_selection import train_test_split
 
 from config.cfg import cfg

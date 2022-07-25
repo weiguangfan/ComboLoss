@@ -1,12 +1,12 @@
 import os
 import sys
-from collections import OrderedDict
+from collections import OrderedDict  #python 的collection package
 
 import numpy as np
 import pandas as pd
-from PIL import Image
-from skimage import io
-from torch.utils.data import Dataset
+from PIL import Image  # python的Pillow package
+from skimage import io  # python的scikit-image package
+from torch.utils.data import Dataset  # 用来加载数据
 
 sys.path.append('../')
 from config.cfg import cfg
@@ -23,16 +23,21 @@ class ScutFBPDataset(Dataset):
         self.transform = transform
 
     def __len__(self):
+        """集成并覆盖此方法；返回数据集的大小"""
         return len(self.face_files)
 
     def __getitem__(self, idx):
+        """集成并覆盖此方法；为一个给定的键获取一个数据样本。"""
+        # io.imread()函数，接收路径名，返回ndarray
         image = io.imread(os.path.join(cfg['scut_fbp_dir'], 'SCUT-FBP-%d.jpg' % self.face_files[idx]))
         score = self.face_score[idx]
 
         sample = {'image': image, 'score': score, 'class': round(score) - 1,
                   'filename': 'SCUT-FBP-%d.jpg' % self.face_files[idx]}
 
+
         if self.transform:
+            # Image.fromarray()函数，接收一个ndarray，返回image object
             sample['image'] = self.transform(Image.fromarray(sample['image'].astype(np.uint8)))
 
         return sample
@@ -96,6 +101,8 @@ class SCUTFBP5500Dataset(Dataset):
 
     def __init__(self, train=True, transform=None):
         if train:
+            # pd.read_csv()函数，接收文件名，后缀.csv，返回DataFrame
+            # pd.DataFrame.iloc()函数，
             self.face_img = pd.read_csv(os.path.join(cfg['scutfbp5500_base'],
                                                      'train_test_files/split_of_60%training and 40%testing/train.txt'),
                                         sep=' ', header=None).iloc[:, 0].tolist()
