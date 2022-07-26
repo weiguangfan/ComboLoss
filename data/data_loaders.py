@@ -1,8 +1,8 @@
 import sys
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split  # sklearn model_selection.train_test_split()函数，接收数据集，返回四个数据集
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader  # pytorch torch.utils.data.DataLoader 数据加载器
 from torchvision import transforms
 from torchvision.transforms import Lambda
 
@@ -16,17 +16,24 @@ def load_scutfbp():
     load SCUTFBP Dataset
     :return:
     """
+    # pd.read_excel()函数，接收excel文件的路径，返回DataFrame
     df = pd.read_excel('../data/SCUT-FBP.xlsx', sheet_name='Sheet1')
+    # model_selection.tran_test_split()函数，将数组随机拆分为训练集和测试集
     X_train, X_test, y_train, y_test = train_test_split(df['Image'].tolist(), df['Attractiveness label'],
                                                         test_size=0.2, random_state=cfg['random_seed'])
 
     resize_to = 224
-
+    # torchvision.transforms.Compose()函数，将几个变换组合在一起。
     train_dataset = ScutFBPDataset(f_list=X_train, f_labels=y_train, transform=transforms.Compose([
+        # torchvision.transforms.Resize()函数，调整输入图像的大小；
         transforms.Resize(resize_to),
+        # torchvision.transforms.RandomRotation()函数，按角度旋转图像；
         transforms.RandomRotation(30),
+        # torchvision.transforms.ColorJitter()函数，随机改变一个图像的亮度、对比度、饱和度和色调；
         transforms.ColorJitter(0.1, 0.1, 0.1, 0.1),
+        # torchvision.transforms.ToTensor()函数，将PIL image or numpy ndarray转化为张量；
         transforms.ToTensor(),
+        # torchvision.transforms.Normalize()函数，用平均值和标准偏差对张量图像进行归一化。
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]))
 
@@ -35,7 +42,7 @@ def load_scutfbp():
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]))
-
+    # torch.utils.data.DataLoader()，数据加载器；
     train_dataloader = DataLoader(train_dataset, batch_size=cfg['batch_size'],
                                   shuffle=True, num_workers=50, pin_memory=True)
     test_dataloader = DataLoader(test_dataset, batch_size=cfg['batch_size'],

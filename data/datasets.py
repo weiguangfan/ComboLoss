@@ -18,7 +18,10 @@ class ScutFBPDataset(Dataset):
     """
 
     def __init__(self, f_list, f_labels, transform=None):
+        # f_list 图像索引列表
         self.face_files = f_list
+        # f_labels 图像对应吸引力分值
+        # pandas.series.tolist()函数，返回python list
         self.face_score = f_labels.tolist()
         self.transform = transform
 
@@ -38,6 +41,7 @@ class ScutFBPDataset(Dataset):
 
         if self.transform:
             # Image.fromarray()函数，接收一个ndarray，返回image object
+            # self.transform:torchvision.transforms.Compose()函数，将几个变换组合在一起。
             sample['image'] = self.transform(Image.fromarray(sample['image'].astype(np.uint8)))
 
         return sample
