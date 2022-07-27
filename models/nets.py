@@ -1,26 +1,29 @@
 import math
 
-import torch.nn as nn
-import torch.nn.functional as F
+import torch.nn as nn  # pytorch torch.nn
+import torch.nn.functional as F  # pytorch torch.nn.functional
 from torch.nn import init
-from torchvision import models
+from torchvision import models   # torchvision
 
-from pytorchcv.model_provider import get_model as ptcv_get_model
+from pytorchcv.model_provider import get_model as ptcv_get_model  # pytorchcv package
 
-
+# torch.nn.Module 所有神经网络模块的基类；
 class ComboNet(nn.Module):
     """
     definition of ComboNet
     """
 
     def __init__(self, num_out=5, backbone_net_name='SEResNeXt50'):
-        super(ComboNet, self).__init__()
+        super(ComboNet, self).__init__()  # 在对子类进行赋值之前，必须先对父类进行__init__()调用。
 
         if backbone_net_name == 'SEResNeXt50':
+            # 获取预训练的模型
             seresnext50 = ptcv_get_model("seresnext50_32x4d", pretrained=True)
+
             num_ftrs = seresnext50.output.in_features
             self.backbone = seresnext50.features
         elif backbone_net_name == 'ResNet18':
+            # torchvision.models
             resnet18 = models.resnet18(pretrained=True)
             num_ftrs = resnet18.fc.in_features
             self.backbone = resnet18
