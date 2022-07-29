@@ -8,31 +8,39 @@ from torch.nn import functional as F
 from config.cfg import cfg
 from models.ssim import SSIMLoss
 
-
+# torch.nn.Module 所有神经网络模块的基类；
 class ReconstructionLoss(nn.Module):
     """
     Reconstruction Loss definition
     """
 
     def __init__(self, mse_w=0.4, cos_w=0.4, ssim_w=0.2):
+        # 在对子类进行赋值之前，必须先对父类进行__init__()调用。
         super(ReconstructionLoss, self).__init__()
-
+        # 将mse_w赋值给类属性self.mse_w
         self.mse_w = mse_w
+        # 将cos_w赋值给类属性self.cos_w
         self.cos_w = cos_w
+        # 将ssim_w赋值给类属性self.ssim_w
         self.ssim_w = ssim_w
-
+        # torch.nn.MSELoss():创建一个标准，测量输入x和目标y中每个元素之间的平均平方误差（平方L2准则）。
         self.mse_criterion = nn.MSELoss()
+        # torch.nn.CrossSimilarity():返回x1和x2之间的余弦相似度 的计算，沿着dim。
         self.cosine_criterion = nn.CosineSimilarity()
+        #
         self.ssim_criterion = SSIMLoss()
 
     def forward(self, pred, gt):
+        # 利用真实值和预测值计算MSELoss
         mse_loss = self.mse_criterion(pred, gt)
+        # 利用真实值和预测值计算CosineLoss
         cosine_loss = self.cosine_criterion(pred, gt)
+        # 利用真实值和预测值计算SSIMLoss
         ssim_criterion = self.cosine_criterion(pred, gt)
-
+        # 计算综合损失值：三种损失值的绝对值各自乘以系数，并求和
         reconstruction_loss = self.mse_w * torch.abs(mse_loss) + self.cos_w * torch.abs(cosine_loss) \
                               + self.ssim_w * torch.abs(ssim_criterion)
-
+        # 返回综合损失值
         return reconstruction_loss
 
 
