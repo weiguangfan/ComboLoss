@@ -25,44 +25,50 @@ class ResConvDAE(nn.Module):
 
         return num_features
 
-
+# torch.nn.Module 所有神经网络模块的基类；
 class Encoder(nn.Module):
 
     def __init__(self, with_bias=False):
+        """构造各层"""
+        # 在对子类进行赋值之前，必须先对父类进行__init__()调用。
         super(Encoder, self).__init__()
         self.with_bias = with_bias
-
+        # 连接层包括：conv1--bn1--relu1
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3, padding=1, bias=self.with_bias)  # 224*224
         self.bn1 = nn.BatchNorm2d(64)
         self.relu1 = nn.ReLU()
-
+        # 连接层包括：conv2--bn2--relu2--mpool2
         self.conv2 = nn.Conv2d(64, 64, kernel_size=3, padding=1, bias=self.with_bias)  # 224*224
         self.bn2 = nn.BatchNorm2d(64)
         self.relu2 = nn.ReLU()
         self.mpool2 = nn.MaxPool2d(kernel_size=2, stride=2)  # 112*112
-
+        # 连接层包括：conv3--bn3--relu3
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1, bias=self.with_bias)  # 112*112
         self.bn3 = nn.BatchNorm2d(128)
         self.relu3 = nn.ReLU()
-
+        # 连接层包括：conv4--bn4--relu4--mpool4
         self.conv4 = nn.Conv2d(128, 128, kernel_size=3, padding=1, bias=self.with_bias)  # 112*112
         self.bn4 = nn.BatchNorm2d(128)
         self.relu4 = nn.ReLU()
         self.mpool4 = nn.MaxPool2d(kernel_size=2, stride=2)  # 56*56
-
+        # 连接层包括：conv5--bn5--relu5
         self.conv5 = nn.Conv2d(128, 256, kernel_size=3, padding=1, bias=self.with_bias)  # 56*56
         self.bn5 = nn.BatchNorm2d(256)
         self.relu5 = nn.ReLU()
-
+        # 连接层包括：conv6--bn6--relu6
         self.conv6 = nn.Conv2d(256, 256, kernel_size=3, padding=1, bias=self.with_bias)  # 56*56
         self.bn6 = nn.BatchNorm2d(256)
         self.relu6 = nn.ReLU()
-
+        # 连接层包括：conv7--bn7--relu7
         self.conv7 = nn.Conv2d(256, 256, kernel_size=3, padding=1, bias=self.with_bias)  # 56*56
         self.bn7 = nn.BatchNorm2d(256)
         self.relu7 = nn.ReLU()
 
     def forward(self, x):
+        """构造跳跃结构，实现前向传播"""
+        # 将各层赋值给对应的变量
+        # 这种传递感觉太慢了，为什么不写成OrderDict()或者Sequential():为了构造跳跃结构
+        # 在连续2层的卷积层中，将输入x跳着连接至2层后的输出。
         x1 = self.conv1(x)
         x2 = self.bn1(x1)
         x3 = self.relu1(x2)
@@ -95,20 +101,25 @@ class Encoder(nn.Module):
         return x23
 
     def num_flat_features(self, x):
-        size = x.size()[1:]  # all dimensions except the batch dimension
+        # Tensor.size():返回自我张量的大小。
+        size = x.size()[1:]  # 所有的维度，除了批次维度
         num_features = 1
+        # 遍历各个维度的值
         for s in size:
+            # 计算元素的总数
             num_features *= s
-
+        # 返回张量的元素的总数
         return num_features
 
-
+# torch.nn.Module 所有神经网络模块的基类；
 class Decoder(nn.Module):
 
     def __init__(self, with_bias=False):
+        """构建各层"""
+        # 在对子类进行赋值之前，必须先对父类进行__init__()调用。
         super(Decoder, self).__init__()
         self.with_bias = with_bias
-
+        # torch.nn.ConvTranspose2d():在由多个输入平面组成的输入图像上应用二维转置卷积运算。
         self.deconv1 = nn.ConvTranspose2d(256, 256, kernel_size=1, bias=self.with_bias)  # 56*56
         self.bn1 = nn.BatchNorm2d(256)
         self.relu1 = nn.ReLU()
@@ -140,6 +151,7 @@ class Decoder(nn.Module):
         self.sigmoid7 = nn.Sigmoid()
 
     def forward(self, x):
+        """构造跳跃结构，实现反向传播"""
         x1 = self.deconv1(x)
         x2 = self.bn1(x1)
         x3 = self.relu1(x2)
@@ -176,9 +188,12 @@ class Decoder(nn.Module):
         return x23
 
     def num_flat_features(self, x):
-        size = x.size()[1:]  # all dimensions except the batch dimension
+        # Tensor.size():返回自我张量的大小。
+        size = x.size()[1:]  # 所有的维度，除了批次维度
         num_features = 1
+        # 遍历各个维度的值
         for s in size:
+            # 计算元素的总数
             num_features *= s
-
+        # 返回张量的元素的总数
         return num_features
