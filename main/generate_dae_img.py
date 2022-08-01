@@ -52,9 +52,12 @@ def generate_img_with_dae(img_f, model):
     img.unsqueeze_(0)
     # torch.to():从self.to(*args, **kwargs)的参数中推断出Torch.dtype和Torch.device。
     img = img.to(device)
-
+    #
     output = model(img)
-
+    # torch.to():从self.to(*args, **kwargs)的参数中推断出Torch.dtype和Torch.device。
+    # torch.Tensor.detach():返回一个新的张量，从当前图形中分离出来。结果将永远不需要梯度。
+    # torch.Tensor.numpy():将自我张量作为NumPy的ndarray返回。
+    # numpy.astype():数组的拷贝，映射成指定的类型。
     output = output.to("cpu").detach().numpy().astype(np.float)[0].transpose([1, 2, 0])
     output[:, :, 0] *= 0.229
     output[:, :, 0] += 0.485
@@ -63,7 +66,9 @@ def generate_img_with_dae(img_f, model):
     output[:, :, 2] *= 0.225
     output[:, :, 2] += 0.406
     output *= 255.0
+    # torch.Tensor.clip():将输入的所有元素夹在 [ min, max ] 范围内。
     output = output.clip(0, 255)
+    # PIL.Image.fromarray(obj, mode=None):从一个输出数组接口的对象中创建一个图像存储器（使用缓冲区协议）。
     output = Image.fromarray(np.uint8(output), mode='RGB')
 
     os.makedirs(args['save_to_dir'], exist_ok=True)
@@ -72,11 +77,15 @@ def generate_img_with_dae(img_f, model):
 
 
 if __name__ == '__main__':
+    # 实例化对象
     resconvdae = ResConvDAE()
     model_name = resconvdae.__class__.__name__
+    # Module.float():将所有的浮点参数和缓冲区转换为float数据类型。
     resconvdae = resconvdae.float()
+    # Module.to():这个方法将只把浮点或复杂的参数和缓冲区转换为dtype（如果给定）。
     resconvdae = resconvdae.to(device)
     print('Start testing %s...' % model_name)
+    # Module.load_state_dict():missing_keys是一个包含缺失键的str列表。unexpected_keys 是一个包含意外键的str列表。
     resconvdae.load_state_dict(torch.load(args['ckpt']))
     for img_f in os.listdir(args['img_dir']):
         generate_img_with_dae(os.path.join(args['img_dir'], img_f), resconvdae)
