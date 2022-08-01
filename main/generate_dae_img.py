@@ -36,18 +36,23 @@ def generate_img_with_dae(img_f, model):
     model.eval()
     # skimage.io.imread():从文件中加载一个图像，返回一个数组
     img = io.imread(img_f)
+    # numpy.ndarray.astype():数组的拷贝，映射成指定的类型。
     # PIL.Image.fromarray:从一个输出数组接口的对象中创建一个图像存储器（使用缓冲区协议）。
     img = Image.fromarray(img.astype(np.uint8))
     # torchvision.transforms.Compose():将几个变换组合在一起。
-
+    # transforms.Resize():将输入的图像调整到给定的尺寸。
+    # transforms.ToTensor():将PIL图像或numpy.ndarray转换为张量。
     preprocess = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
     ])
-
+    # 将输入图像进行组合变换：尺寸改变、转换为tensor
     img = preprocess(img)
+    # torch.unsqueeze():返回一个新的张量，在指定的位置插入一个尺寸为1的张量。返回的张量与这个张量共享相同的基础数据。
     img.unsqueeze_(0)
+    # torch.to():从self.to(*args, **kwargs)的参数中推断出Torch.dtype和Torch.device。
     img = img.to(device)
+
     output = model(img)
 
     output = output.to("cpu").detach().numpy().astype(np.float)[0].transpose([1, 2, 0])

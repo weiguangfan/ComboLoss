@@ -1,12 +1,13 @@
 import torch.nn as nn
 
-
+# torch.nn.Module 所有神经网络模块的基类；
 class ResConvDAE(nn.Module):
     """
     definition of ResConvDAE
     """
 
     def __init__(self):
+        # 在对子类进行赋值之前，必须先对父类进行__init__()调用。
         super(ResConvDAE, self).__init__()
         self.encoder = Encoder()
         self.decoder = Decoder()
@@ -18,11 +19,14 @@ class ResConvDAE(nn.Module):
         return x2
 
     def num_flat_features(self, x):
-        size = x.size()[1:]  # all dimensions except the batch dimension
+        # Tensor.size():返回自我张量的大小。
+        size = x.size()[1:]  # 所有的维度，除了批次维度
         num_features = 1
+        # 遍历各个维度的值
         for s in size:
+            # 计算元素的总数
             num_features *= s
-
+        # 返回张量的元素的总数
         return num_features
 
 # torch.nn.Module 所有神经网络模块的基类；
