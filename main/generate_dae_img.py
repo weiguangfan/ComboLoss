@@ -5,14 +5,14 @@
 """
 import os
 import sys
-import argparse
+import argparse  # argparse:python  package
 
 import cv2
 import numpy as np
 import torch
-from PIL import Image
-from torchvision import transforms
-from skimage import io
+from PIL import Image  # python pillow package
+from torchvision import transforms  # torchvision
+from skimage import io  # scikit-image package
 
 sys.path.append('../')
 from models.resconvdae import *
@@ -32,9 +32,13 @@ def generate_img_with_dae(img_f, model):
     :param model:
     :return:
     """
+    # torch.nn.Module.eval():将模块设置为评估模式。
     model.eval()
+    # skimage.io.imread():从文件中加载一个图像，返回一个数组
     img = io.imread(img_f)
+    # PIL.Image.fromarray:从一个输出数组接口的对象中创建一个图像存储器（使用缓冲区协议）。
     img = Image.fromarray(img.astype(np.uint8))
+    # torchvision.transforms.Compose():将几个变换组合在一起。
 
     preprocess = transforms.Compose([
         transforms.Resize((224, 224)),
