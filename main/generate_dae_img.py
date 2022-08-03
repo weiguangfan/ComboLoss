@@ -22,6 +22,7 @@ args.add_argument('-ckpt', help='checkpoint of pretrained ResDAE', type=str, def
 args.add_argument('-img_dir', help='image directory', type=str, default='/home/xulu/DataSet/Face/SCUT-FBP/Crop')
 args.add_argument('-save_to_dir', help='image directory', type=str, default='./gen_img')
 args = vars(args.parse_args())
+# device全局变量：条件判断cuda是否可用
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -52,17 +53,21 @@ def generate_img_with_dae(img_f, model):
     img.unsqueeze_(0)
     # torch.to():从self.to(*args, **kwargs)的参数中推断出Torch.dtype和Torch.device。
     img = img.to(device)
-    #
+    # 调用ResConvDAE类的方法encoder():不对
     output = model(img)
     # torch.to():从self.to(*args, **kwargs)的参数中推断出Torch.dtype和Torch.device。
     # torch.Tensor.detach():返回一个新的张量，从当前图形中分离出来。结果将永远不需要梯度。
     # torch.Tensor.numpy():将自我张量作为NumPy的ndarray返回。
     # numpy.astype():数组的拷贝，映射成指定的类型。
+    # numpy.ndarray.transpose():返回一个转轴的数组视图。
     output = output.to("cpu").detach().numpy().astype(np.float)[0].transpose([1, 2, 0])
+    # 0维执行操作：先乘后加
     output[:, :, 0] *= 0.229
     output[:, :, 0] += 0.485
+    # 1维执行操作：先乘后加
     output[:, :, 1] *= 0.224
     output[:, :, 1] += 0.456
+    # 2维执行操作：先乘后加
     output[:, :, 2] *= 0.225
     output[:, :, 2] += 0.406
     output *= 255.0
@@ -72,6 +77,7 @@ def generate_img_with_dae(img_f, model):
     output = Image.fromarray(np.uint8(output), mode='RGB')
 
     os.makedirs(args['save_to_dir'], exist_ok=True)
+    # torch.save():将一个对象保存到一个磁盘文件。
     output.save('./{}/gen_{}'.format(args['save_to_dir'], img_f.split(os.path.sep)[-1]))
     print(f'Reconstructed image for {os.path.basename(img_f)} has been generated...')
 
@@ -85,7 +91,8 @@ if __name__ == '__main__':
     # Module.to():这个方法将只把浮点或复杂的参数和缓冲区转换为dtype（如果给定）。
     resconvdae = resconvdae.to(device)
     print('Start testing %s...' % model_name)
-    # Module.load_state_dict():missing_keys是一个包含缺失键的str列表。unexpected_keys 是一个包含意外键的str列表。
+    # Module.load_state_dict():missing_keys是一个包含缺失键的str列表。
+    # unexpected_keys 是一个包含意外键的str列表。
     resconvdae.load_state_dict(torch.load(args['ckpt']))
     for img_f in os.listdir(args['img_dir']):
         generate_img_with_dae(os.path.join(args['img_dir'], img_f), resconvdae)
