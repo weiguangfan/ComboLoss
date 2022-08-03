@@ -75,7 +75,7 @@ def generate_img_with_dae(img_f, model):
     output = output.clip(0, 255)
     # PIL.Image.fromarray(obj, mode=None):从一个输出数组接口的对象中创建一个图像存储器（使用缓冲区协议）。
     output = Image.fromarray(np.uint8(output), mode='RGB')
-
+    # os.makedirs():
     os.makedirs(args['save_to_dir'], exist_ok=True)
     # torch.save():将一个对象保存到一个磁盘文件。
     output.save('./{}/gen_{}'.format(args['save_to_dir'], img_f.split(os.path.sep)[-1]))
