@@ -75,9 +75,11 @@ def generate_img_with_dae(img_f, model):
     output = output.clip(0, 255)
     # PIL.Image.fromarray(obj, mode=None):从一个输出数组接口的对象中创建一个图像存储器（使用缓冲区协议）。
     output = Image.fromarray(np.uint8(output), mode='RGB')
-    # os.makedirs():
+    # os.makedirs():用数字模式创建一个名为path的目录。
     os.makedirs(args['save_to_dir'], exist_ok=True)
     # torch.save():将一个对象保存到一个磁盘文件。
+    # os.path.sep():
+    # os.path.basename():返回pathname路径的基本名称。
     output.save('./{}/gen_{}'.format(args['save_to_dir'], img_f.split(os.path.sep)[-1]))
     print(f'Reconstructed image for {os.path.basename(img_f)} has been generated...')
 
@@ -94,5 +96,7 @@ if __name__ == '__main__':
     # Module.load_state_dict():missing_keys是一个包含缺失键的str列表。
     # unexpected_keys 是一个包含意外键的str列表。
     resconvdae.load_state_dict(torch.load(args['ckpt']))
+    # os.listdir():返回一个包含path给定的目录中的条目名称的列表。
+    # os.path.join():智能地连接一个或多个路径组件。
     for img_f in os.listdir(args['img_dir']):
         generate_img_with_dae(os.path.join(args['img_dir'], img_f), resconvdae)

@@ -62,11 +62,12 @@ def extract_features_with_dae(img_f, model):
     # numpy.ndarray.transpose():返回一个转轴的数组视图。
     # numpy.ndarray.ravel():返回一个连续的扁平化的数组。
     feat = output.to("cpu").detach().numpy().astype(np.float)[0].transpose([1, 2, 0]).ravel()
-
+    # os.makedirs():用数字模式创建一个名为path的目录。
+    # os.path.sep():
     os.makedirs(args['save_to_dir'], exist_ok=True)
     with open('./{}/gen_{}'.format(args['save_to_dir'], img_f.split(os.path.sep)[-1].split('.')[0] + '.pkl'),
               'wb') as f:
-
+        # pickle.dump():将对象obj的pickled表示法写到开放文件的对象文件中。
         pickle.dump(feat, f)
         print(f'extract deep features for {os.path.basename(img_f)} successfully...')
 
@@ -83,5 +84,7 @@ if __name__ == '__main__':
     # Module.load_state_dict():missing_keys是一个包含缺失键的str列表。
     # unexpected_keys 是一个包含意外键的str列表。
     resconvdae.load_state_dict(torch.load(args['ckpt']))
+    # os.listdir():返回一个包含path给定的目录中的条目名称的列表。
     for img_f in os.listdir(args['img_dir']):
+        # os.path.join():智能地连接一个或多个路径组件。
         extract_features_with_dae(os.path.join(args['img_dir'], img_f), resconvdae)
