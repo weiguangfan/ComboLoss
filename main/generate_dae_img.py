@@ -16,11 +16,16 @@ from skimage import io  # scikit-image package
 
 sys.path.append('../')
 from models.resconvdae import *
-
+# argparse.ArgumentParser():创建一个ArgumentParser对象。
+# ArgumentParser 对象将持有将命令行解析为Python数据类型的所有必要信息。
 args = argparse.ArgumentParser()
+# add_argument():将程序参数的信息填充到ArgumentParser中。
 args.add_argument('-ckpt', help='checkpoint of pretrained ResDAE', type=str, default='./model/ResConvDAE.pth')
 args.add_argument('-img_dir', help='image directory', type=str, default='/home/xulu/DataSet/Face/SCUT-FBP/Crop')
 args.add_argument('-save_to_dir', help='image directory', type=str, default='./gen_img')
+# parse_args():解析参数。
+# 这将检查命令行，将每个参数转换为适当的类型，然后调用适当的动作。
+# vars():返回一个模块、类、实例或任何其他有__dict__属性的对象的__dict__属性。
 args = vars(args.parse_args())
 # device全局变量：条件判断cuda是否可用
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
