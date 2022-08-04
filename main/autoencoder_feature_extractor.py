@@ -28,6 +28,7 @@ args.add_argument('-save_to_dir', help='image directory', type=str, default='./f
 # 这将检查命令行，将每个参数转换为适当的类型，然后调用适当的动作。
 # vars():返回一个模块、类、实例或任何其他有__dict__属性的对象的__dict__属性。
 args = vars(args.parse_args())
+# torch.device是一个代表设备的对象，torch.Tensor已经或将要被分配到这个设备上。
 # device全局变量：条件判断cuda是否可用
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 

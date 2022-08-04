@@ -1,19 +1,19 @@
 import copy
-import os
-import sys
-import time
-import math
+import os  # pytho os module
+import sys  # python sys module
+import time  # python time module
+import math  # python math module
 
 import cv2
-import numpy as np
-import pandas as pd
-from PIL import Image
-from scipy import spatial
-import torch
-import torch.nn.functional as F
-import torch.optim as optim
+import numpy as np  # numpy package
+import pandas as pd  # pandas package
+from PIL import Image  # python Pillow package
+from scipy import spatial  # scipy package
+import torch  # PyTorch torch module
+import torch.nn.functional as F  # PyTorch torch.nn.functional module
+import torch.optim as optim  # PyTorch torch.optim module
 from torch.optim import lr_scheduler
-from torchvision import transforms
+from torchvision import transforms  # torchvision package
 
 sys.path.append('../')
 from models import ssim
@@ -38,8 +38,11 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
     :return:
     """
     print(model)
+    # instance.__class__:一个类实例所属的类。
     model_name = model.__class__.__name__
     model = model.float()
+    # torch.device是一个代表设备的对象，torch.Tensor已经或将要被分配到这个设备上。
+    # device全局变量：条件判断cuda是否可用
     device = torch.device('cuda:0' if torch.cuda.is_available() and cfg['use_gpu'] else 'cpu')
 
     if torch.cuda.device_count() > 1:
@@ -177,9 +180,11 @@ def main(model, data_name):
     :return:
     """
     # criterion = ReconstructionLoss()
+    # torch.nn.MSELoss():创建一个标准，测量输入x和目标y中每个元素之间的平均平方误差（平方L2准则）。
     criterion = nn.MSELoss()
-
+    # torch.optim.Adam():实现Adam算法。
     optimizer_ft = optim.Adam(model.parameters(), lr=0.01, weight_decay=1e-4)
+    # torch.optim.lr_scheduler.StepLR():
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=100, gamma=0.1)
 
     if data_name == 'SCUT-FBP':
@@ -197,7 +202,7 @@ def main(model, data_name):
     else:
         print('Invalid data name. It can only be SCUT-FBP or HotOrNot...')
         sys.exit(0)
-
+    # 调用函数train_model():
     train_model(model=model, dataloaders=dataloaders, criterion=criterion, optimizer=optimizer_ft,
                 scheduler=exp_lr_scheduler, num_epochs=cfg['epoch'], inference=False)
 
@@ -229,7 +234,9 @@ def ext_res_dae_feat(img, res_dae):
 
 
 if __name__ == '__main__':
+    # 实例化对象
     res_conv_dae = ResConvDAE()
+    # 调用函数main():传入一个实例对象，一个字符串
     main(res_conv_dae, 'SCUT-FBP5500')
 
     # resConvDAE = ResConvDAE()
