@@ -37,16 +37,21 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
     :param inference:
     :return:
     """
+    # model:ResConvDAE类的一个实例对象
     print(model)
     # instance.__class__:一个类实例所属的类。
+    # definition.__name__:类、函数、方法、描述符或生成器实例的名称。
     model_name = model.__class__.__name__
+    #
     model = model.float()
+    # torch.cuda.is_available():返回一个bool，表示CUDA当前是否可用。
     # torch.device是一个代表设备的对象，torch.Tensor已经或将要被分配到这个设备上。
     # device全局变量：条件判断cuda是否可用
     device = torch.device('cuda:0' if torch.cuda.is_available() and cfg['use_gpu'] else 'cpu')
-
+    # torch.cuda.device_count():返回可用的GPU的数量。
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
+        # torch.nn.DataParaller():
         model = nn.DataParallel(model)
     model = model.to(device)
 
@@ -184,9 +189,9 @@ def main(model, data_name):
     criterion = nn.MSELoss()
     # torch.optim.Adam():实现Adam算法。
     optimizer_ft = optim.Adam(model.parameters(), lr=0.01, weight_decay=1e-4)
-    # torch.optim.lr_scheduler.StepLR():
+    # torch.optim.lr_scheduler.StepLR():每隔step_size epochs对每个参数组的学习率进行伽玛衰减。
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=100, gamma=0.1)
-
+    # 根据data_name字符串，加载相应的数据：
     if data_name == 'SCUT-FBP':
         print('start loading SCUTFBPDataset...')
         dataloaders = load_reconstruct_scutfbp()
@@ -201,6 +206,7 @@ def main(model, data_name):
         dataloaders = load_reconstruct_scutfbp5500_cv(cfg['cv_index'])
     else:
         print('Invalid data name. It can only be SCUT-FBP or HotOrNot...')
+        # sys.exit():引发一个SystemExit异常，表示打算退出解释器。
         sys.exit(0)
     # 调用函数train_model():
     train_model(model=model, dataloaders=dataloaders, criterion=criterion, optimizer=optimizer_ft,
