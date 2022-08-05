@@ -42,7 +42,7 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
     # instance.__class__:一个类实例所属的类。
     # definition.__name__:类、函数、方法、描述符或生成器实例的名称。
     model_name = model.__class__.__name__
-    #
+    # torch.nn.Module.float():将所有的浮点参数和缓冲区转换为float数据类型。
     model = model.float()
     # torch.cuda.is_available():返回一个bool，表示CUDA当前是否可用。
     # torch.device是一个代表设备的对象，torch.Tensor已经或将要被分配到这个设备上。
@@ -51,10 +51,11 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
     # torch.cuda.device_count():返回可用的GPU的数量。
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
-        # torch.nn.DataParaller():
+        # torch.nn.DataParaller():在模块层面上实施数据并行化。
         model = nn.DataParallel(model)
+    # torch.nn.Moudle.to():移动 and\or 映射参数parameters和缓冲区buffers。
     model = model.to(device)
-
+    # 根据字典的键的具体的字符串，返回对应的划分数据集
     dataset_sizes = {x: len(dataloaders[x].dataset) for x in ['train', 'val', 'test']}
 
     for k, v in dataset_sizes.items():
@@ -62,8 +63,10 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
 
     if not inference:
         print('Start training %s...' % model_name)
+        # time.time():以浮点数的形式返回自纪元以来的时间（秒）。
         since = time.time()
-
+        # torch.nn.Module.state_dict():返回一个包含模块整体状态的字典。
+        # copy.deepcopy():
         best_model_wts = copy.deepcopy(model.state_dict())
         best_ssim = 0.0
         best_cosine_similarity = 0.0
@@ -77,11 +80,14 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
             for phase in ['train', 'val']:
                 if phase == 'train':
                     if torch.__version__ <= '1.1.0':
+                        # torch.optim.lr_scheduler.StepLR.step():学习率调度器，每个调度器都是在前一个调度器获得的学习率上一个接一个地应用。
                         scheduler.step()
+                    # torch.nn.Module.train():将模块设置为训练模式。
                     model.train()  # Set model to training mode
                 else:
+                    # torch.nn.Module.eval():将模块设置为评估模式。
                     model.eval()  # Set model to evaluate mode
-
+                # 设置初始参数
                 running_loss = 0.0
                 running_ssim = 0.0
                 running_l2_dis = 0.0
@@ -89,36 +95,51 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
 
                 # Iterate over data.
                 # for data in dataloaders[phase]:
+                # enumerate():返回一个元组，
+                # 该元组包含一个计数（从开始，默认为 0）和在 iterable 上迭代得到的值。
                 for i, data in enumerate(dataloaders[phase], 0):
-
+                    # 获取数据集的真实标签
                     inputs = data['image']
+                    # torch.nn.Moudle.to():移动 and\or 映射参数parameters和缓冲区buffers。
                     inputs = inputs.to(device)
 
                     # zero the parameter gradients
+                    # Optimizer.zero_grad():将所有优化的Torch.Tensor s的梯度设置为零。
                     optimizer.zero_grad()
 
                     # forward
                     # track history if only in train
+                    # torch.set_grad_enabled():将根据其参数模式来启用或禁用梯度。
                     with torch.set_grad_enabled(phase == 'train'):
+                        # 计算预测值
                         outputs = model(inputs)
-
+                        # 计算损失值
                         loss = criterion(outputs, inputs)
 
                         # backward + optimize only if in training phase
                         if phase == 'train':
+                            # 损失求和并反向传播
                             loss.sum().backward()
+                            # Optimizer.step():优化器更新，执行一个单一的优化步骤（参数更新）。
                             optimizer.step()
 
                     # statistics
                     running_loss += loss.sum() * inputs.size(0)
+                    # torch.to():从self.to(*args, **kwargs)的参数中推断出Torch.dtype和Torch.device。
+                    # torch.Tensor.detach():返回一个新的张量，从当前图形中分离出来。结果将永远不需要梯度。
+                    # torch.Tensor.numpy():将自我张量作为NumPy的ndarray返回。
+                    # spatial.distance.cosine():
                     running_cos_sim += 1 - spatial.distance.cosine(outputs.to('cpu').detach().numpy().ravel(),
                                                                    inputs.to('cpu').detach().numpy().ravel())
+                    # numpy.linalg.norm()
                     running_l2_dis += np.linalg.norm(
                         outputs.to('cpu').detach().numpy().ravel() - inputs.to('cpu').detach().numpy().ravel())
+                    #
                     running_ssim += ssim.ssim(outputs, inputs)
 
                 if phase == 'train':
                     if torch.__version__ >= '1.1.0':
+                        # torch.optim.lr_scheduler.StepLR.step():学习率调度器，每个调度器都是在前一个调度器获得的学习率上一个接一个地应用。
                         scheduler.step()
 
                 epoch_loss = running_loss / dataset_sizes[phase]
@@ -139,7 +160,7 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
                     mkdirs_if_not_exist(model_path_dir)
                     state_dict = model.module.state_dict() if torch.cuda.device_count() > 1 else model.state_dict()
                     torch.save(state_dict, './model/{0}_best_epoch-{1}.pth'.format(model_name, epoch))
-
+        # 计算用时
         time_elapsed = time.time() - since
         print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
         print('Best L2_Distance: {:4f}'.format(best_l2_dis))

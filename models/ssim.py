@@ -101,11 +101,16 @@ class SSIMLoss(torch.nn.Module):
 
 
 def ssim(img1, img2, window_size=11, size_average=True):
+    # Tensor.size():返回自我张量各个维度的大小。
     (_, channel, _, _) = img1.size()
+    # 调用函数create_window():返回张量
     window = create_window(window_size, channel)
-
+    # torch.Tensor.is_cuda():如果张量存储在GPU上，则为真，否则为假。
     if img1.is_cuda:
+        # Tensor.get_device():对于CUDA张量，该函数返回张量所在的GPU的设备序号。
+        # Tensor.cuda():返回此对象在CUDA内存中的副本。
         window = window.cuda(img1.get_device())
+    # Tensor.type_as():返回这个张量，并将其转换为给定张量的类型。
     window = window.type_as(img1)
-
+    # 调用__ssim()函数：
     return _ssim(img1, img2, window, window_size, channel, size_average)
