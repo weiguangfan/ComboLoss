@@ -66,7 +66,7 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
         # time.time():以浮点数的形式返回自纪元以来的时间（秒）。
         since = time.time()
         # torch.nn.Module.state_dict():返回一个包含模块整体状态的字典。
-        # copy.deepcopy():
+        # copy.deepcopy():返回x的一个深度拷贝。
         best_model_wts = copy.deepcopy(model.state_dict())
         best_ssim = 0.0
         best_cosine_similarity = 0.0
@@ -131,10 +131,10 @@ def train_model(model, dataloaders, criterion, optimizer, scheduler, num_epochs,
                     # spatial.distance.cosine():
                     running_cos_sim += 1 - spatial.distance.cosine(outputs.to('cpu').detach().numpy().ravel(),
                                                                    inputs.to('cpu').detach().numpy().ravel())
-                    # numpy.linalg.norm()
+                    # numpy.linalg.norm()：
                     running_l2_dis += np.linalg.norm(
                         outputs.to('cpu').detach().numpy().ravel() - inputs.to('cpu').detach().numpy().ravel())
-                    #
+                    # 调用函数ssim():
                     running_ssim += ssim.ssim(outputs, inputs)
 
                 if phase == 'train':
