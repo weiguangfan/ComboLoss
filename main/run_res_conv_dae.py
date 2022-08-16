@@ -1,10 +1,10 @@
-import copy
+import copy  # python copy module
 import os  # pytho os module
 import sys  # python sys module
 import time  # python time module
 import math  # python math module
 
-import cv2
+import cv2  # pypi
 import numpy as np  # numpy package
 import pandas as pd  # pandas package
 from PIL import Image  # python Pillow package
@@ -12,12 +12,12 @@ from scipy import spatial  # scipy package
 import torch  # PyTorch torch module
 import torch.nn.functional as F  # PyTorch torch.nn.functional module
 import torch.optim as optim  # PyTorch torch.optim module
-from torch.optim import lr_scheduler
+from torch.optim import lr_scheduler  # PyTorch torch.optim.lr_scheduler
 from torchvision import transforms  # torchvision package
 
 sys.path.append('../')
 from models import ssim
-from models.resconvdae import *
+from models.resconvdae import *   # 从路径文件 models/resconvdae.py 导入类和函数
 from models.losses import ReconstructionLoss
 from data.data_loaders import load_reconstruct_scutfbp, load_reconstruct_hotornot, load_reconstruct_scutfbp5500_64, \
     load_reconstruct_scutfbp5500_cv

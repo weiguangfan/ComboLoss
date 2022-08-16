@@ -9,10 +9,13 @@ class ResConvDAE(nn.Module):
     def __init__(self):
         # 在对子类进行赋值之前，必须先对父类进行__init__()调用。
         super(ResConvDAE, self).__init__()
+        # 实例化类Encoder
         self.encoder = Encoder()
+        # 实例化类Decoder
         self.decoder = Decoder()
 
     def forward(self, x):
+        # 实现前向传播
         x1 = self.encoder(x)
         x2 = self.decoder(x1)
 
@@ -155,7 +158,7 @@ class Decoder(nn.Module):
         self.sigmoid7 = nn.Sigmoid()
 
     def forward(self, x):
-        """构造跳跃结构，实现反向传播"""
+        """构造跳跃结构，实现前向传播"""
         x1 = self.deconv1(x)
         x2 = self.bn1(x1)
         x3 = self.relu1(x2)
