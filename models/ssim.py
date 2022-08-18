@@ -1,7 +1,7 @@
 import sys
 import torch
 import torch.nn.functional as F  # pytorch torch.nn.functional
-from math import exp
+from math import exp  # python math package
 from torch.autograd import Variable  # pytorch torch.autograd.Variable
 
 sys.path.append('../')

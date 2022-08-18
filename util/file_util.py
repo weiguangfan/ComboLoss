@@ -13,7 +13,10 @@ def mkdirs_if_not_exist(dir_name):
     :param dir_name:
     :return:
     """
+    # os.path.isdir:如果路径是一个现有的目录，返回True。
+    # os.path.exists:如果路径指的是一个现有的路径或一个开放的文件描述符，则返回True。
     if not os.path.isdir(dir_name) or not os.path.exists(dir_name):
+        # os.makedirs:递归目录创建函数。
         os.makedirs(dir_name)
 
 
