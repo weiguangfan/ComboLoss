@@ -1,22 +1,22 @@
 """
 train and eval ComboLoss
 """
-import copy
-import os
-import sys
-import time
+import copy  # python copy package
+import os  # python os package
+import sys  # python sys package
+import time  # python time package
 
-import numpy as np
-import pandas as pd
-import torch
-import torch.optim as optim
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+import numpy as np  # numpy
+import pandas as pd  # pandas
+import torch  # PyTorch
+import torch.optim as optim  # PyTorch torch.opitm module
+from sklearn.metrics import mean_absolute_error, mean_squared_error  # sklearn.metrics
 from sklearn.metrics import recall_score, precision_score, f1_score, confusion_matrix, accuracy_score
-from torch import nn
-from torch.optim import lr_scheduler
-import torch.nn.functional as F
-from torchvision import models
-from pytorchcv.model_provider import get_model as ptcv_get_model
+from torch import nn  # PyTorch.torch.nn module
+from torch.optim import lr_scheduler  # PyTorch.torch.optim module
+import torch.nn.functional as F  # PyTorch.torch.nn.functional module
+from torchvision import models  # torchvirsion
+from pytorchcv.model_provider import get_model as ptcv_get_model  # python pytorchcv package
 
 sys.path.append('../')
 from models.nets import ComboNet
@@ -569,8 +569,11 @@ def main(model, data_name, model_type):
 
 
 if __name__ == '__main__':
+    # 调用预训练的模型 seresnext50_32x4d
     seresnext50 = ptcv_get_model("seresnext50_32x4d", pretrained=True)
+    # 获取输入数据？
     num_ftrs = seresnext50.output.in_features
+    # torch.nn.Linear():对传入的数据进行线性转换:y = xA^T + b
     seresnext50.output = nn.Linear(num_ftrs, 1)
 
     # resnet18 = models.resnet18(pretrained=True)

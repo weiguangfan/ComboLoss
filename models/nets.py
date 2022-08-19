@@ -10,14 +10,14 @@ from pytorchcv.model_provider import get_model as ptcv_get_model  # pytorchcv pa
 # torch.nn.Module 所有神经网络模块的基类；
 class ComboNet(nn.Module):
     """
-    definition of ComboNet
+    定义ComboNet类
     """
 
     def __init__(self, num_out=5, backbone_net_name='SEResNeXt50'):
         super(ComboNet, self).__init__()  # 在对子类进行赋值之前，必须先对父类进行__init__()调用。
 
         if backbone_net_name == 'SEResNeXt50':
-            # 获取预训练的模型
+            # 调用预训练的模型 seresnext50_32x4d
             seresnext50 = ptcv_get_model("seresnext50_32x4d", pretrained=True)
 
             num_ftrs = seresnext50.output.in_features
